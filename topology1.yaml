@@ -1,0 +1,45 @@
+nodes:
+  -
+    name: "cl1"
+    type: "client"
+  -
+    name: "cl2"
+    type: "client"
+    ip_address: "192.168.0.5/24"
+    gateway: "192.168.0.1"
+  -
+    name: "rtr"
+    type: "router"
+    lan_ip: "192.168.0.1/24"
+  -
+    name: "cld"
+    type: "cloud"
+  -
+    name: "web"
+    type: "client"
+links:
+  -
+    source:
+      name: "cl1"
+    destination:
+      name: "rtr"
+      port: 1
+  -
+    source:
+      name: "cl2"
+    destination:
+      name: "rtr"
+      port: 2
+  -
+    source:
+      name: "rtr"
+      port: 0
+    destination:
+      name: "cld"
+      port: 0
+  -
+    source:
+      name: "web"
+    destination:
+      name: "cld"
+      port: 1

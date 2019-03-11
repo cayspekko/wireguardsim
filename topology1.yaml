@@ -2,21 +2,44 @@ nodes:
   -
     name: "cl1"
     type: "client"
+    ports:
+      - ip_address: "192.168.0.10/24"
+        gateway: "192.168.0.1"
   -
     name: "cl2"
     type: "client"
-    ip_address: "192.168.0.5/24"
-    gateway: "192.168.0.1"
+    ports:
+      - ip_address: "192.168.1.5/24"
+        gateway: "192.168.1.1"
   -
     name: "rtr"
     type: "router"
-    lan_ip: "192.168.0.1/24"
+    ports:
+      - ip_address: "30.0.0.1/30"
+        gateway: "30.0.0.2"
+        masquerade: true
+      - ip_address: "192.168.0.1/24"
+  -
+    name: "rtr2"
+    type: "router"
+    ports:
+      - ip_address: "30.0.2.1/30"
+        gateway: "30.0.2.2"
+        masquerade: true
+      - ip_address: "192.168.1.1/24"
   -
     name: "cld"
     type: "cloud"
+    ports:
+      - ip_address: "30.0.0.2/30"
+      - ip_address: "30.0.1.2/30"
+      - ip_address: "30.0.2.2/30"
   -
     name: "web"
     type: "client"
+    ports:
+      - ip_address: "30.0.1.1/30"
+        gateway: "30.0.1.2"
 links:
   -
     source:
@@ -28,8 +51,8 @@ links:
     source:
       name: "cl2"
     destination:
-      name: "rtr"
-      port: 2
+      name: "rtr2"
+      port: 1
   -
     source:
       name: "rtr"
@@ -37,6 +60,13 @@ links:
     destination:
       name: "cld"
       port: 0
+  -
+    source:
+      name: "rtr2"
+      port: 0
+    destination:
+      name: "cld"
+      port: 2
   -
     source:
       name: "web"

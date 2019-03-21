@@ -1,19 +1,11 @@
+#!/usr/bin/env -S pipenv run python3
 import subprocess
 import itertools
-import ipaddress
 import yaml
 import os
 from functools import partial
 from tempfile import NamedTemporaryFile
     
-
-def run(cmd):
-    return subprocess.check_output(cmd.split())
-
-
-def sudo(cmd):
-    return "sudo " + cmd
-
 
 def _ip_netns_exec(nsname, cmd):
     return f"ip netns exec {nsname} {cmd}"
@@ -77,14 +69,6 @@ def clean_ns(nsname):
     yield f"ip netns del {nsname}"
 
 
-def next_network(network, mask_inc):
-    n = ipaddress.ip_network(network)
-    while True:
-        rval = str(n)
-        n = ipaddress.ip_network('{}/{}'.format(n.network_address + (1 << (n.max_prefixlen - mask_inc)), n.netmask))
-        yield rval
-
-
 class DHCPServer:
     config = """
 start {start}
@@ -94,7 +78,7 @@ lease_file {lease_file}
 pid_file {pid_file}
 """
 
-    cmd = "ip netns exec {namespace} sudo udhcpd -f {config}"
+    cmd = "ip netns exec {namespace} udhcpd -f {config}"
 
     def __init__(self, start, end, interface, namespace):
         self.p = None
@@ -191,7 +175,7 @@ def generate_script(script, *generators):
 def main(argv):
     # First, load the topology from file
     with open(argv[1]) as f:
-        topology = yaml.load(f)
+        topology = yaml.load(f, Loader=yaml.Loader)
 
     # initialize each node object
     for node in topology['nodes']:
@@ -233,7 +217,7 @@ def main(argv):
     def write_script(filename, script):
         with open(filename, 'w') as f:
             f.write('#!/bin/bash\n')
-            f.write("\n".join(sudo(l) for l in script))
+            f.write("\n".join(l for l in script))
         os.chmod(filename, 0o774)
 
     script_filename = f'{argv[1]}.sh'.replace('.yaml', '')
@@ -244,7 +228,7 @@ def main(argv):
 
     print('#!/bin/bash')
     for l in script:
-        print(sudo(l))
+        print(l)
 
 
 if __name__ == "__main__":

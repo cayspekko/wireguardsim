@@ -1,0 +1,34 @@
+nodes:
+  -
+    name: "cl1"
+    type: "client"
+    ports:
+      - ip_address: "192.168.0.10/24"
+        gateway: "192.168.0.1"
+  -
+    name: "rtr"
+    type: "router"
+    ports:
+      - ip_address: "30.0.0.1/30"
+        gateway: "30.0.0.2"
+        masquerade: true
+      - ip_address: "192.168.0.1/24"
+  -
+    name: "cld"
+    type: "cloud"
+    ports:
+      - ip_address: "30.0.0.2/30"
+links:
+  -
+    source:
+      name: "cl1"
+    destination:
+      name: "rtr"
+      port: 1
+  -
+    source:
+      name: "rtr"
+      port: 0
+    destination:
+      name: "cld"
+      port: 0

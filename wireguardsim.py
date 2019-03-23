@@ -1,4 +1,3 @@
-#!/usr/bin/env -S pipenv run python3
 import subprocess
 import itertools
 import yaml

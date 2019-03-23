@@ -183,6 +183,7 @@ def main(argv):
 
     # initialize each node object
     for node in topology['nodes']:
+        # lookup the type and instantiate it: e.g. Router("rtr")
         node_init = type_map.get(node['type'], BaseNode)(node['name'])
         node['init'] = node_init
 

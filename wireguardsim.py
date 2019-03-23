@@ -82,7 +82,11 @@ pid_file {pid_file}
     def __init__(self, start, end, interface, namespace):
         self.p = None
         self.files = [NamedTemporaryFile('w+') for _ in range(3)]
-        self.config = self.config.format(start=start, end=end, interface=interface, lease_file=self.files[1].name, pid_file=self.files[2].name)
+        self.config = self.config.format(start=start,
+                                         end=end,
+                                         interface=interface,
+                                         lease_file=self.files[1].name,
+                                         pid_file=self.files[2].name)
         self.cmd = self.cmd.format(namespace=namespace, config=self.files[0].name)
         self.files[0].write(self.config)
 
@@ -156,7 +160,8 @@ class Router(BaseNode):
         ports = node['ports']
         return itertools.chain(
             super().configure_extra(node),
-            ip_netns_exec(name, *(masquerade(f'veth{name}{i}') for i, port in enumerate(ports) if port.get('masquerade'))),
+            ip_netns_exec(name, *(masquerade(f'veth{name}{i}') for i, port in enumerate(ports)
+                                  if port.get('masquerade'))),
         )
 
 
@@ -201,6 +206,7 @@ def main(argv):
         *(node['init'].configure_veths(link['destination']['name'], link['destination'].get('port'))
           for link in topology['links'] for node in topology['nodes']),
 
+        # add ip and anything extra
         *(node['init'].configure_ip(i, port['ip_address'], port.get('gateway'))
           for node in topology['nodes'] for i, port in enumerate(node['ports'])),
 
